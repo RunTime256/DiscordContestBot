@@ -1,4 +1,4 @@
-package me.spider.contestbot.structures;
+package me.spider.contestbot.contestcommand.structures;
 
 public enum  Category {
     EMOJI("Emoji"), ART("Art"), MUSIC("Music"), WRITING("Music");

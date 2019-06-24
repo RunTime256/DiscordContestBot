@@ -1,4 +1,4 @@
-package me.spider.contestbot.structures;
+package me.spider.contestbot.contestcommand.votes;
 
 import lombok.Data;
 import lombok.Getter;
