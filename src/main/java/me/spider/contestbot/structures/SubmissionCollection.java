@@ -23,9 +23,17 @@ public class SubmissionCollection {
         return submissions.remove(submission);
     }
 
-    public void removeSubmission(String mysteryID) {
+    public void removeSubmission(String submissionID) {
         submissions.forEach(sub -> {
-            if (sub.getSubmitterID().equals(mysteryID) || sub.getSubmissionID().equals(mysteryID)) {
+            if (sub.getSubmissionID().equals(submissionID)) {
+                submissions.remove(sub);
+            }
+        });
+    }
+
+    public void removeAllSubmissions(String unluckyUserID){
+        submissions.forEach(sub -> {
+            if(sub.getSubmitterID().equals(unluckyUserID)){
                 submissions.remove(sub);
             }
         });
