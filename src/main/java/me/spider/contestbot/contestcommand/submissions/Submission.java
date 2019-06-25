@@ -2,18 +2,16 @@ package me.spider.contestbot.contestcommand.submissions;
 
 import lombok.Data;
 import lombok.Getter;
-import net.dv8tion.jda.core.entities.Message;
 
-public @Data
-class Submission {
-    private @Getter String submissionID;
-    private @Getter String submitterID;
-    private @Getter Message submissionContent;
+public @Data class Submission {
+    private @Getter long submitterID;
+    private @Getter long submissionID;
+    private @Getter String content;
 
-    public Submission(Message submissionContent){
-        this.submissionContent = submissionContent;
-        this.submissionID = submissionContent.getId();
-        this.submitterID = submissionContent.getAuthor().getId();
+    public Submission(long submitterID, long submissionID, String content)
+    {
+        this.submitterID = submitterID;
+        this.submissionID = submissionID;
+        this.content = content;
     }
-
 }

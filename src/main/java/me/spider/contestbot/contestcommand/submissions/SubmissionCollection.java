@@ -1,60 +1,54 @@
 package me.spider.contestbot.contestcommand.submissions;
 
-import java.util.ArrayList;
+import me.spider.contestbot.contestcommand.submissions.exceptions.ReachedMaxSubmissionsException;
+import me.spider.contestbot.sql.Session;
+import me.spider.contestbot.sql.SessionFactory;
 
-public class SubmissionCollection {
-    private ArrayList<Submission> submissions = new ArrayList<>();
-    private String contestID;
+public class SubmissionCollection
+{
+    private int maxSubmissions;
 
-    public SubmissionCollection(String contestID) {
-        this.contestID = contestID;
+    public SubmissionCollection(int maxSubmissions)
+    {
+        this.maxSubmissions = maxSubmissions;
     }
 
-    public SubmissionCollection(String contestID, ArrayList<Submission> submissions) {
-        this.submissions = submissions;
-        this.contestID = contestID;
-    }
-
-    public boolean addSubmission(Submission submission) {
-        return submissions.add(submission);
-    }
-
-    public boolean removeSubmission(Submission submission) {
-        return submissions.remove(submission);
-    }
-
-    public void removeSubmission(String submissionID) {
-        submissions.forEach(sub -> {
-            if (sub.getSubmissionID().equals(submissionID)) {
-                submissions.remove(sub);
-            }
-        });
-    }
-
-    public void removeAllSubmissions(String unluckyUserID){
-        submissions.forEach(sub -> {
-            if(sub.getSubmitterID().equals(unluckyUserID)){
-                submissions.remove(sub);
-            }
-        });
-    }
-
-    public boolean hasSubmitted(String userID) {
-        for (Submission sub : submissions) {
-            if (sub.getSubmitterID().equals(userID)) {
-                return true;
-            }
+    public int getSubmissionCount(long contestID)
+    {
+        try (Session session = SessionFactory.getSession())
+        {
+            SubmissionMapper mapper = session.getMapper(SubmissionMapper.class);
+            return mapper.getTotalSubmissionCount(contestID).intValue();
         }
-        return false;
     }
 
-    public int countSubmissions(String userID){
-        int amount = 0;
-        for(Submission sub : submissions){
-            if(sub.getSubmitterID().equals(userID)){
-                amount++;
-            }
+    public void addSubmission(long submitterID, long submissionID, String content, long contestID) throws ReachedMaxSubmissionsException
+    {
+        if (hasReachedMaxSubmissions(submitterID, contestID))
+            throw new ReachedMaxSubmissionsException();
+
+        try (Session session = SessionFactory.getSession())
+        {
+            SubmissionMapper mapper = session.getMapper(SubmissionMapper.class);
+            mapper.addSubmission(submissionID, submitterID, content, contestID);
         }
-        return amount;
+    }
+
+    public void removeSubmission(long submitterID, long submissionID)
+    {
+        try (Session session = SessionFactory.getSession())
+        {
+            SubmissionMapper mapper = session.getMapper(SubmissionMapper.class);
+            mapper.removeSubmission(submitterID, submissionID);
+        }
+    }
+
+    private boolean hasReachedMaxSubmissions(long submitterID, long contestID)
+    {
+        try (Session session = SessionFactory.getSession())
+        {
+            SubmissionMapper mapper = session.getMapper(SubmissionMapper.class);
+            return mapper.getSubmissionCount(submitterID, contestID) >= maxSubmissions;
+        }
     }
 }

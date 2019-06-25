@@ -1,6 +1,9 @@
 package me.spider.contestbot.contestcommand.votes;
 
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 public interface VoteMapper
 {
@@ -12,11 +15,11 @@ public interface VoteMapper
 
     @Select("SELECT COUNT(*) FROM contest.vote WHERE " +
             "voter_id = #{voterID} AND submission_id = #{submissionID} AND contest_id = #{contestID}")
-    Long getSubmissionVoteCount(@Param("voterID") long voterID, @Param("submissionID")long submissionID, @Param("contestID") long contestID);
+    Long getSubmissionVoteCount(@Param("voterID") long voterID, @Param("submissionID") long submissionID, @Param("contestID") long contestID);
 
     @Insert("INSERT INTO contest.vote (id, voter_id, submission_id, contest_id) VALUES " +
             "(#{messageID}, #{voterID}, #{submissionID}, #{contestID}")
-    void addVote(@Param("messageID") long messageID, @Param("voterID") long voterID, @Param("submissionID")long submissionID, @Param("contestID") long contestID);
+    void addVote(@Param("messageID") long messageID, @Param("voterID") long voterID, @Param("submissionID") long submissionID, @Param("contestID") long contestID);
 
     @Delete("DELETE FROM contest.vote WHERE voter_id = #{voterID} AND submission_id = #{submissionID}")
     void removeVote(@Param("voterID") long voterID, @Param("submissionID")long submissionID);

@@ -13,12 +13,12 @@ public class VoteCollection {
         this.maxVotes = maxVotes;
     }
 
-    public long getVoteTotal(long submissionID, long contestID)
+    public int getVoteTotal(long submissionID, long contestID)
     {
         try (Session session = SessionFactory.getSession())
         {
             VoteMapper mapper = session.getMapper(VoteMapper.class);
-            return mapper.getTotalVotes(submissionID, contestID);
+            return mapper.getTotalVotes(submissionID, contestID).intValue();
         }
     }
 
