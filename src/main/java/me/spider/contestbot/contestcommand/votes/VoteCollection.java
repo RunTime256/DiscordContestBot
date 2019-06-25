@@ -1,83 +1,65 @@
 package me.spider.contestbot.contestcommand.votes;
 
-import net.dv8tion.jda.core.entities.Message;
-
-import java.util.ArrayList;
+import me.spider.contestbot.contestcommand.votes.exceptions.PreviouslyVotedForSubmissionException;
+import me.spider.contestbot.contestcommand.votes.exceptions.ReachedMaxVotesException;
+import me.spider.contestbot.sql.Session;
+import me.spider.contestbot.sql.SessionFactory;
 
 public class VoteCollection {
-    private ArrayList<Vote> votes = new ArrayList<>();
-    private String contestID;
+    private int maxVotes;
 
-    public VoteCollection(String channelID){
-        this.contestID = channelID;
+    public VoteCollection(int maxVotes)
+    {
+        this.maxVotes = maxVotes;
     }
 
-    public VoteCollection(String channelID, ArrayList<Vote> votes){
-        this.contestID = channelID;
-        this.votes = votes;
-    }
-
-    public boolean addVote(Vote v){
-        return votes.add(v);
-    }
-
-    public boolean removeVote(Vote v){
-        return votes.remove(v);
-    }
-
-    public void removeVote(String userID, String submissionID){
-        votes.forEach(v -> {
-            if(v.getSubmissionID().equals(submissionID) && v.getVoterID().equals(userID)){
-                votes.remove(v);
-            }
-        });
-    }
-
-    public void clearVotesFromSubmission(String submissionID){
-        votes.forEach(v -> {
-            if(v.getSubmissionID().equals(submissionID)){
-                votes.remove(v);
-            }
-        });
-    }
-
-    public void clearVotesVotesFromUser(String userID){
-        votes.forEach(v -> {
-            if(v.getVoterID().equals(userID)){
-                votes.remove(v);
-            }
-        });
-    }
-
-    public boolean hasUserVoted(String userID){
-        for (Vote vote : votes) {
-            if(vote.getVoterID().equals(userID)){
-                return true;
-            }
+    public long getVoteTotal(long submissionID, long contestID)
+    {
+        try (Session session = SessionFactory.getSession())
+        {
+            VoteMapper mapper = session.getMapper(VoteMapper.class);
+            return mapper.getTotalVotes(submissionID, contestID);
         }
-        return false;
     }
 
-    public boolean hasUserVoted(String userID, Message submission){
-        String submissionID = submission.getId();
-        for(Vote vote : votes){
-            if(vote.getSubmissionID().equals(submissionID)){
-                if(vote.getVoterID().equals(userID)){
-                    return true;
-                }
-            }
+    public void addVote(long messageID, long voterID, long submissionID, long contestID) throws PreviouslyVotedForSubmissionException, ReachedMaxVotesException
+    {
+        if (hasVotedForSubmission(voterID, submissionID, contestID))
+            throw new PreviouslyVotedForSubmissionException();
+        if (hasReachedMaxVotes(voterID, contestID))
+            throw new ReachedMaxVotesException();
+
+        try (Session session = SessionFactory.getSession())
+        {
+            VoteMapper mapper = session.getMapper(VoteMapper.class);
+            mapper.addVote(messageID, voterID, submissionID, contestID);
         }
-        return false;
     }
 
-    public boolean hasUserVoted(String userID, String submitterID){
-        for(Vote vote : votes){
-            if(vote.getSubmitterID().equals(submitterID)){
-                if(vote.getVoterID().equals(userID)){
-                    return true;
-                }
-            }
+    public void removeVote(long voterID, long submissionID)
+    {
+        try (Session session = SessionFactory.getSession())
+        {
+            VoteMapper mapper = session.getMapper(VoteMapper.class);
+            mapper.removeVote(voterID, submissionID);
         }
-        return false;
+    }
+
+    private boolean hasVotedForSubmission(long voterID, long submissionID, long contestID)
+    {
+        try (Session session = SessionFactory.getSession())
+        {
+            VoteMapper mapper = session.getMapper(VoteMapper.class);
+            return mapper.getSubmissionVoteCount(voterID, submissionID, contestID) != 0;
+        }
+    }
+
+    private boolean hasReachedMaxVotes(long voterID, long contestID)
+    {
+        try (Session session = SessionFactory.getSession())
+        {
+            VoteMapper mapper = session.getMapper(VoteMapper.class);
+            return mapper.getVoteCount(voterID, contestID) >= maxVotes;
+        }
     }
 }
