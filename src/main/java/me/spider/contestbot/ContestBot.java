@@ -1,6 +1,5 @@
 package me.spider.contestbot;
 
-import me.spider.contestbot.sql.Session;
 import me.spider.contestbot.sql.SessionFactory;
 
 import java.io.IOException;

@@ -5,19 +5,12 @@ import lombok.Getter;
 import net.dv8tion.jda.core.entities.Message;
 
 public @Data class Vote {
-    private @Getter String voterID;
-    private @Getter String submitterID;
-    private @Getter String submissionID;
+    private @Getter long voterID;
+    private @Getter long submissionID;
 
-    public Vote(String userID, Message message){
-        this.voterID = userID;
-        this.submitterID = message.getAuthor().getId();
-        this.submissionID = message.getId();
-    }
-
-    public Vote(String userID, String submitterID, String submissionID){
-        this.voterID = userID;
-        this.submitterID = submitterID;
+    public Vote(long voterID, long submissionID)
+    {
+        this.voterID = voterID;
         this.submissionID = submissionID;
     }
 }
