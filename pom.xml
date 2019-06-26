@@ -16,6 +16,13 @@
     </repositories>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/com.elega9t/number-to-words -->
+        <dependency>
+            <groupId>com.elega9t</groupId>
+            <artifactId>number-to-words</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
         <dependency>
             <groupId>com.jagrosh</groupId>
             <artifactId>jda-utilities</artifactId>

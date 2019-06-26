@@ -6,6 +6,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.AllArgsConstructor;
 import me.spider.contestbot.ContestBot;
 import me.spider.contestbot.contestcommand.contests.ContestCollection;
+import me.spider.contestbot.contestcommand.structures.Category;
 import me.spider.contestbot.contestcommand.structures.Period;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -38,20 +39,23 @@ public class ContestCommands {
                 new CommandQuery<String>("What suggestion will you give to applicants?", this::findSuggestion, suggestion ->
                     new CommandQuery<String>("What rules will you define?", this::findRules, rules ->
                         new CommandQuery<Period>("When will the contest end?", this::findPeriod, period ->
-                            create(event, category, suggestion, rules, period)
+                            create(event, me.spider.contestbot.contestcommand.structures.Category.getCategory(category), suggestion, rules, period)
                         )
                     )
                 )
             );
         }
 
-        private void create(CommandEvent event, String category, String suggestion, String rules, Period period) {
+
+
+        private void create(CommandEvent event, me.spider.contestbot.contestcommand.structures.Category category, String suggestion, String rules, Period period) {
 
         }
 
         // These are all placeholders, I'm not sure what types these will end up being
 
-        private String findCategory(Message message) {
+
+        private String findCategory(Message message){
             return message.getContentRaw();
         }
 
@@ -64,9 +68,58 @@ public class ContestCommands {
         }
 
         private Period findPeriod(Message message) {
-            return new Period(Date.valueOf(message.getContentRaw()).getTime()); // This is a bad way to get dates
+            return new Period(getEpochFromText(message.getContentRaw())); // This is a bad way to get dates
+        }
+
+        //todo this can be improved a bit
+        private long getEpochFromText(String input) throws IllegalArgumentException{
+            String[] single = new String[]{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"};
+            String[] differentNums = input.toLowerCase().split("and");
+            long epoch = 0;
+            for(String str : differentNums){
+                String[] pieces = str.split(" ");
+                long amount = -1;
+                String potentialNum = pieces[0];
+                if(potentialNum.matches("\\d+")){
+                    amount = Integer.parseInt(pieces[0]);
+                } else {
+                    for(int i = 0; i < single.length; i++){
+                        if(potentialNum.equals(single[i])){
+                            amount = i + 1;
+                        }
+                    }
+                }
+                if(amount == -1){
+                    throw new IllegalArgumentException();
+                }
+                String unit = pieces[1];
+                switch (unit) {
+                    case "day":
+                    case "days":
+                        epoch += TimeUnit.DAYS.toMillis(amount);
+                        break;
+                    case "hour":
+                    case "hours":
+                        epoch += TimeUnit.HOURS.toMillis(amount);
+                        break;
+                    case "minute":
+                    case "minutes":
+                        epoch += TimeUnit.MINUTES.toMillis(amount);
+                        break;
+                    case "week":
+                    case "weeks":
+                        epoch += TimeUnit.DAYS.toMillis(1) * 7;
+                        break;
+                }
+
+
+            }
+
+            return -1;
         }
     }
+
+
 
     // Waits for a response upon receiving a message
     @AllArgsConstructor
