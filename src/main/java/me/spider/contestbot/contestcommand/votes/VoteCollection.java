@@ -25,44 +25,44 @@ public class VoteCollection {
         return votes.remove(v);
     }
 
-    public void removeVote(String userID, String submissionID){
+    public void removeVote(long userID, long submissionID){
         votes.forEach(v -> {
-            if(v.getSubmissionID().equals(submissionID) && v.getVoterID().equals(userID)){
+            if(v.getSubmissionID() == submissionID && v.getVoterID() == userID){
                 votes.remove(v);
             }
         });
     }
 
-    public void clearVotesFromSubmission(String submissionID){
+    public void clearVotesFromSubmission(long submissionID){
         votes.forEach(v -> {
-            if(v.getSubmissionID().equals(submissionID)){
+            if(v.getSubmissionID() == submissionID){
                 votes.remove(v);
             }
         });
     }
 
-    public void clearVotesVotesFromUser(String userID){
+    public void clearVotesVotesFromUser(long userID){
         votes.forEach(v -> {
-            if(v.getVoterID().equals(userID)){
+            if(v.getVoterID() == userID){
                 votes.remove(v);
             }
         });
     }
 
-    public boolean hasUserVoted(String userID){
+    public boolean hasUserVoted(long userID){
         for (Vote vote : votes) {
-            if(vote.getVoterID().equals(userID)){
+            if(vote.getVoterID() == userID){
                 return true;
             }
         }
         return false;
     }
 
-    public boolean hasUserVoted(String userID, Message submission){
-        String submissionID = submission.getId();
+    public boolean hasUserVoted(long userID, Message submission){
+        long submissionID = submission.getIdLong();
         for(Vote vote : votes){
-            if(vote.getSubmissionID().equals(submissionID)){
-                if(vote.getVoterID().equals(userID)){
+            if(vote.getSubmissionID() == submissionID){
+                if(vote.getVoterID() == userID){
                     return true;
                 }
             }
@@ -70,14 +70,4 @@ public class VoteCollection {
         return false;
     }
 
-    public boolean hasUserVoted(String userID, String submitterID){
-        for(Vote vote : votes){
-            if(vote.getSubmitterID().equals(submitterID)){
-                if(vote.getVoterID().equals(userID)){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 }

@@ -3,7 +3,6 @@ package me.spider.contestbot;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.sun.corba.se.impl.activation.CommandHandler;
 import lombok.Getter;
 import me.spider.contestbot.contestcommand.ContestCommands;
 import me.spider.contestbot.sql.SessionFactory;
